@@ -3,6 +3,12 @@ import requests
 import json
 import time
 from typing import Dict, Any
+import os
+from pathlib import Path
+
+# Get the directory where this script is located
+SCRIPT_DIR = Path(__file__).parent
+ASSETS_DIR = SCRIPT_DIR.parent / "assets" / "screenshots"
 
 st.set_page_config(
     page_title="AI Workload Orchestrator",
@@ -358,19 +364,19 @@ col1, col2, col3, col4 = st.columns(4)
 
 screenshots = [
     {
-        "path": "dashboard/assets/screenshots/step1_demo_ui.png",
+        "path": str(ASSETS_DIR / "step1_demo_ui.png"),
         "caption": "1. Submit Task"
     },
     {
-        "path": "dashboard/assets/screenshots/step2_task_result.png",
+        "path": str(ASSETS_DIR / "step2_task_result.png"),
         "caption": "2. View Result"
     },
     {
-        "path": "dashboard/assets/screenshots/step3_admin_login.png",
+        "path": str(ASSETS_DIR / "step3_admin_login.png"),
         "caption": "3. Admin Login"
     },
     {
-        "path": "dashboard/assets/screenshots/step4_admin_dashboard.png",
+        "path": str(ASSETS_DIR / "step4_admin_dashboard.png"),
         "caption": "4. Dashboard"
     }
 ]
