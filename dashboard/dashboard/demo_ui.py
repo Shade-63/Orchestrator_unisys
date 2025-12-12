@@ -188,6 +188,24 @@ h2, h3 {
     animation: slideIn 0.6s ease-in-out;
 }
 
+/* Admin link button styling */
+.stLinkButton > a {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    border: none !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3) !important;
+    transition: all 0.3s ease-in-out !important;
+}
+
+.stLinkButton > a:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5) !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -274,6 +292,101 @@ with right:
 st.markdown("---")
 
 
+# How It Works Section
+st.markdown("## 🔄 How It Works")
+st.markdown("**See the AI Orchestrator in action - from task submission to intelligent routing**")
+
+# Initialize selected step in session state
+if "selected_step" not in st.session_state:
+    st.session_state.selected_step = 1
+
+# Step selector buttons
+st.markdown("""
+<style>
+.screenshot-container {
+    transition: all 0.3s ease;
+    border: 3px solid transparent;
+    border-radius: 10px;
+    padding: 5px;
+    cursor: pointer;
+}
+.screenshot-selected {
+    border: 3px solid #667eea !important;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    transform: translateY(-5px);
+}
+.screenshot-container:hover {
+    border: 3px solid #764ba2;
+    box-shadow: 0 6px 20px rgba(118, 75, 162, 0.3);
+    transform: translateY(-3px);
+}
+</style>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<div class="result-card" style="padding: 20px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px;">
+    <h3 style="color: white; margin-bottom: 15px; font-weight: 600;">📸 Workflow Demo</h3>
+    <p style="font-size: 13px; color: rgba(255, 255, 255, 0.9); margin-bottom: 20px;">
+        Click on a step number to see the complete workflow in action
+    </p>
+</div>
+""", unsafe_allow_html=True)
+
+# Step selector buttons
+col1, col2, col3, col4 = st.columns(4)
+
+with col1:
+    if st.button("1️⃣ Submit Task", key="step1_btn", use_container_width=True):
+        st.session_state.selected_step = 1
+
+with col2:
+    if st.button("2️⃣ View Result", key="step2_btn", use_container_width=True):
+        st.session_state.selected_step = 2
+
+with col3:
+    if st.button("3️⃣ Admin Login", key="step3_btn", use_container_width=True):
+        st.session_state.selected_step = 3
+
+with col4:
+    if st.button("4️⃣ Dashboard", key="step4_btn", use_container_width=True):
+        st.session_state.selected_step = 4
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# Display all screenshots in a row
+col1, col2, col3, col4 = st.columns(4)
+
+screenshots = [
+    {
+        "path": "C:/Users/sumsr/.gemini/antigravity/brain/47b67666-525d-475e-9e4c-ca68187374ac/step1_demo_ui_1765571611127.png",
+        "caption": "1. Submit Task"
+    },
+    {
+        "path": "C:/Users/sumsr/.gemini/antigravity/brain/47b67666-525d-475e-9e4c-ca68187374ac/step2_task_result_1765571630913.png",
+        "caption": "2. View Result"
+    },
+    {
+        "path": "C:/Users/sumsr/.gemini/antigravity/brain/47b67666-525d-475e-9e4c-ca68187374ac/step3_admin_login_1765571652856.png",
+        "caption": "3. Admin Login"
+    },
+    {
+        "path": "C:/Users/sumsr/.gemini/antigravity/brain/47b67666-525d-475e-9e4c-ca68187374ac/step4_admin_dashboard_1765571675305.png",
+        "caption": "4. Dashboard"
+    }
+]
+
+for idx, (col, screenshot) in enumerate(zip([col1, col2, col3, col4], screenshots), 1):
+    with col:
+        # Add selected class if this is the selected step
+        class_name = "screenshot-selected" if st.session_state.selected_step == idx else ""
+        
+        st.markdown(f'<div class="screenshot-container {class_name}">', unsafe_allow_html=True)
+        st.image(screenshot["path"], caption=screenshot["caption"], use_column_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown("---")
+
+
 if st.session_state.results:
     st.markdown("## 📋 Recent Executions")
     st.markdown("**Latest orchestration decisions and routing results**")
@@ -309,6 +422,14 @@ else:
 
 
 with st.sidebar:
+    # Admin access button at the top
+    st.link_button(
+        "🔐 Sign in as admin",
+        "http://localhost:8502",
+        use_container_width=True
+    )
+    
+    st.markdown("---")
     st.header("📊 System Overview")
 
     if st.button("🔄 Refresh System Status", use_container_width=True):

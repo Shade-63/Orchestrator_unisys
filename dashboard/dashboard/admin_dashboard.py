@@ -227,6 +227,84 @@ div[data-testid="stDataFrame"]::-webkit-scrollbar-thumb {
 
 ORCHESTRATOR_URL = "http://localhost:8000/api"
 
+# Authentication credentials
+ADMIN_USERNAME = "admin"
+ADMIN_PASSWORD = "admin123"
+
+# Initialize session state
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+if "username" not in st.session_state:
+    st.session_state.username = ""
+
+def login(username, password):
+    """Validate credentials and update session state"""
+    if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+        st.session_state.authenticated = True
+        st.session_state.username = username
+        return True
+    return False
+
+def logout():
+    """Clear session state and logout"""
+    st.session_state.authenticated = False
+    st.session_state.username = ""
+
+# Login Page
+if not st.session_state.authenticated:
+    st.markdown("""
+    <div class="hero-section" style="text-align: center; max-width: 500px; margin: 100px auto;">
+        <div class="hero-title">🔐 Admin Login</div>
+        <div class="hero-subtitle">Login to access dashboard</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Center the login form
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.markdown("""
+        <div style="
+            background: linear-gradient(180deg, #0f1724 0%, #091027 100%);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+        ">
+        """, unsafe_allow_html=True)
+        
+        with st.form("login_form", clear_on_submit=True):
+            st.markdown("<h3 style='color: #e6eef8; margin-bottom: 20px;'>Enter Credentials</h3>", unsafe_allow_html=True)
+            username = st.text_input("Username", placeholder="admin", key="login_username")
+            password = st.text_input("Password", type="password", placeholder="Enter password", key="login_password")
+            submit = st.form_submit_button("🚀 Login", use_container_width=True)
+            
+            if submit:
+                if login(username, password):
+                    st.success("✅ Login successful! Redirecting...")
+                    time.sleep(1)
+                    st.rerun()
+                else:
+                    st.error("❌ Invalid username or password")
+        
+        st.markdown("</div>", unsafe_allow_html=True)
+    
+    st.stop()
+
+# Logout button in sidebar (only shown when authenticated)
+with st.sidebar:
+    st.markdown(f"### 👤 Logged in as: **{st.session_state.username}**")
+    if st.button("🚪 Logout", use_container_width=True):
+        logout()
+        # Redirect to demo UI after logout
+        st.markdown("""
+        <script>
+            window.location.href = "http://localhost:8501";
+        </script>
+        """, unsafe_allow_html=True)
+        st.success("Logged out! Redirecting to Demo UI...")
+        time.sleep(1)
+    st.markdown("---")
+
 @st.cache_data(ttl=8)
 def fetch_task_history(limit=200):
     try:
