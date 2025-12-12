@@ -1,7 +1,3 @@
-"""
-Admin Dashboard - Monitoring and Analytics Interface
-"""
-
 import streamlit as st
 import requests
 import pandas as pd
@@ -11,128 +7,232 @@ from datetime import datetime
 import time
 
 st.set_page_config(
-    page_title="AI Orchestrator - Admin Dashboard",
+    page_title="AI Workload Orchestrator - Admin",
     page_icon="📊",
     layout="wide"
 )
 
 st.markdown("""
 <style>
-            
-            
-
 @keyframes fadeIn {
-    0% { opacity: 0; transform: translateY(8px); }
+    0% { opacity: 0; transform: translateY(10px); }
     100% { opacity: 1; transform: translateY(0); }
 }
-
+@keyframes slideIn {
+    0% { opacity: 0; transform: translateX(-20px); }
+    100% { opacity: 1; transform: translateX(0); }
+}
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.9; }
+    100% { transform: scale(1); opacity: 1; }
+}
+@keyframes glow {
+    0% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.3); }
+    50% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+    100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.3); }
+}
+@keyframes rocketFly {
+    0% {
+        transform: translateX(-100px) translateY(100px) rotate(-45deg);
+        opacity: 0;
+    }
+    50% {
+        transform: translateX(-30px) translateY(30px) rotate(-20deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(0) translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+}
+.rocket-icon {
+    display: inline-block;
+    animation: rocketFly 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    font-size: 1.5em;
+}
 body, .stApp {
-    background: linear-gradient(145deg, #1c1e24, #111318, #1c1e24);
-    background-size: 200% 200%;
-    animation: gradientShift 12s ease infinite;
-    color: #e2e4e9 !important;
+    background: linear-gradient(145deg, #0f1724 0%, #081027 60%, #081027 100%);
+    color: #e6eef8 !important;
 }
-
 .hero-section {
-    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
-    padding: 35px 30px;
-    border-radius: 16px;
-    margin-bottom: 30px;
-    box-shadow: 0px 8px 20px rgba(0,0,0,0.35);
-    animation: fadeIn 0.6s ease-in-out;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 44px 36px;
+    border-radius: 14px;
+    margin-bottom: 28px;
+    animation: fadeIn 0.8s ease-in-out;
+    box-shadow: 0 10px 40px rgba(102, 126, 234, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.06);
 }
-
 .hero-title {
-    font-size: 42px;
-    color: white;
+    font-size: 44px;
     font-weight: 800;
+    color: white;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.25);
+    margin: 0;
 }
-
 .hero-subtitle {
-    font-size: 20px;
-    color: #e3e9ff;
-    margin-top: -5px;
+    font-size: 18px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.92);
+    margin-top: 8px;
 }
-
-.metric-card {
-    padding-left:38px;
-    margin: 2px;
-    background: #1a1d24;
-    border: 4px solid #dc2626;
-    border-radius:14px
-    padding:20px;
-    border-radius: 14px;
-    box-shadow: 0px 0px 18px rgba(220, 38, 38, 0.35);
-    transition: 0.25s ease-in-out;
-    color: white;
+.metric-box {
+    padding: 18px;
+    border-radius: 12px;
+   
+    border: 1px solid #e6eef8;
+    margin-bottom: 12px;
+    transition: all 0.28s ease-in-out;
+    box-shadow: 0 6px 18px rgba(2,6,23,0.12);
+    color:#000000;
 }
-
-.metric-card:hover {
+.metric-box:hover {
+    box-shadow: 0 10px 30px rgba(102,126,234,0.12);
     transform: translateY(-4px);
-    box-shadow: 0px 8px 24px rgba(0,0,0,0.35);
+    border-color: #667eea;
 }
-
 .node-card {
-    
-    background: #161a22;
-    padding: 20px;
-    border-radius: 14px;
-    box-shadow: 0px 3px 12px rgba(0,0,0,0.25);
-    transition: 0.25s ease-in-out;
+    padding: 18px;
+    background: linear-gradient(180deg, #0f1724 0%, #091027 100%);
+    border-radius: 12px;
+    color: #e6eef8;
+    box-shadow: 0 6px 18px rgba(2,6,23,0.35);
+    border: 1px solid rgba(255,255,255,0.03);
+    margin-bottom: 14px;
 }
-
-.node-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0px 6px 20px rgba(0,0,0,0.35);
+.node-card .small {
+    font-size: 13px;
+    color: rgba(230,238,248,0.8);
 }
-
-.dataframe tbody tr {
-    background-color: #1a1d24 !important;
-    color: #e5e7eb !important;
-}
-
-.dataframe thead {
-    background-color: #0f172a !important;
-    color: white !important;
-}
-
-h1, h2, h3, h4 {
-    color: #f3f4f6 !important;
-}
-
-hr {
-    border: 1px solid #1f2937;
-}
-
 .stButton>button {
-    background-color: #2563eb;
+    width: 100%;
+    height: 56px;
+    font-size: 15px;
+    border-radius: 12px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    border-radius: 8px;
-    padding: 6px 14px;
+    transition: all 0.28s ease-in-out;
     border: none;
-    transition: 0.25s ease-in-out;
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.18);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
 }
-
 .stButton>button:hover {
-    background-color: #1d4ed8;
-    transform: translateY(-2px);
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.28);
+}
+.result-card {
+    padding: 18px;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+    border-radius: 12px;
+    border: 1px solid #e6eef8;
+    margin-bottom: 12px;
+    box-shadow: 0 6px 18px rgba(2,6,23,0.06);
+    color: #061126;
+}
+.result-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(102,126,234,0.08);
+    border-color: #667eea;
+}
+.sidebar-section {
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(230,238,248,0.04);
+    animation: slideIn 0.6s ease-in-out;
+    color: #e6eef8;
+}
+.dataframe thead th {
+    background-color: rgba(102,126,234,0.12) !important;
+    color: #e6eef8 !important;
+}
+.dataframe tbody tr {
+    background-color: rgba(255,255,255,0.02) !important;
+    color: #e6eef8 !important;
+}
+.stCheckbox label, .stSelectbox>div, label {
+    color: #e6eef8 !important;
+}
+h2, h3 {
+    animation: slideIn 0.6s ease-in-out;
+    color: #e6eef8 !important;
+}
+small {
+    color: rgba(230,238,248,0.75);
 }
 
-.stCheckbox label {
-    color: white !important;
+/* ---------------------- PREMIUM CLEAN TABLE ---------------------- */
+
+.table-container {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    padding: 18px;
+    border-radius: 14px;
+    box-shadow: 0 8px 26px rgba(0,0,0,0.12);
+    margin-top: 20px;
+    animation: fadeIn 0.8s ease-in-out;
+    border: 1px solid rgba(230, 230, 230, 0.65);
 }
+
+/* DataFrame wrapper */
+[data-testid="stDataFrame"] div {
+    border-radius: 12px !important;
+}
+
+/* Table Header Styling */
+div[data-testid="stDataFrame"] thead th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 10px !important;
+}
+
+/* Table Body */
+div[data-testid="stDataFrame"] tbody tr {
+    background-color: rgba(255,255,255,0.95) !important;
+    color: #000000 !important;
+    font-size: 14px !important;
+    border-bottom: 1px solid #e6e6e6 !important;
+}
+
+/* Hover effect */
+div[data-testid="stDataFrame"] tbody tr:hover {
+    background-color: #f5f1ff !important;
+}
+
+/* Table Cells */
+div[data-testid="stDataFrame"] tbody td {
+    padding: 12px !important;
+}
+
+/* Scrollbar for wide tables */
+div[data-testid="stDataFrame"]::-webkit-scrollbar {
+    height: 10px;
+}
+div[data-testid="stDataFrame"]::-webkit-scrollbar-thumb {
+    background: #b7a4ff;
+    border-radius: 12px;
+}
+
+
 
 </style>
 """, unsafe_allow_html=True)
 
 ORCHESTRATOR_URL = "http://localhost:8000/api"
 
-@st.cache_data(ttl=10)
+@st.cache_data(ttl=8)
 def fetch_task_history(limit=200):
     try:
         r = requests.get(f"{ORCHESTRATOR_URL}/task-history?limit={limit}", timeout=5)
         if r.status_code == 200:
-            return r.json()["tasks"]
+            return r.json().get("tasks", [])
         return []
     except:
         return []
@@ -142,12 +242,12 @@ def fetch_node_status():
     try:
         r = requests.get(f"{ORCHESTRATOR_URL}/node-status", timeout=5)
         if r.status_code == 200:
-            return r.json()["nodes"]
+            return r.json().get("nodes", {})
         return {}
     except:
         return {}
 
-@st.cache_data(ttl=10)
+@st.cache_data(ttl=8)
 def fetch_statistics():
     try:
         r = requests.get(f"{ORCHESTRATOR_URL}/statistics", timeout=5)
@@ -159,8 +259,8 @@ def fetch_statistics():
 
 st.markdown("""
 <div class="hero-section">
-    <div class="hero-title">📊 AI Orchestrator Admin Dashboard</div>
-    <div class="hero-subtitle">Enterprise-Grade Monitoring • Real-Time Analytics • System Intelligence</div>
+    <div class="hero-title"><span class="rocket-icon">🚀</span> AI Workload Orchestrator - Admin</div>
+    <div class="hero-subtitle">Enterprise Monitoring · Real-Time Analytics · System Intelligence</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -174,72 +274,70 @@ if auto_refresh:
     time.sleep(10)
     st.rerun()
 
-task_history = fetch_task_history()
+task_history = fetch_task_history(limit=300)
 node_status = fetch_node_status()
 statistics = fetch_statistics()
 
 st.markdown("## 📈 Key Metrics")
-
 if statistics:
     overall = statistics.get("overall", {})
     node_stats = statistics.get("node_statistics", [])
 
-    col1, col2, col3, col4 = st.columns(4)
+    m1, m2, m3, m4 = st.columns(4)
 
-    with col1:
-        st.markdown(f"<div class='metric-card'><h3>Total Tasks</h3><h2>{overall.get('total_tasks', 0)}</h2></div>", unsafe_allow_html=True)
+    with m1:
+        st.markdown(f"<div class='metric-box'><h4 style='margin:0;'>Total Tasks</h4><h2 style='margin:6px 0 0 0;'>{overall.get('total_tasks', 0)}</h2><small>since tracking</small></div>", unsafe_allow_html=True)
 
-    with col2:
+    with m2:
         success = overall.get("success_rate", 0) * 100
-        st.markdown(f"<div class='metric-card'><h3>Success Rate</h3><h2>{success:.1f}%</h2></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='metric-box'><h4 style='margin:0;'>Success Rate</h4><h2 style='margin:6px 0 0 0;'>{success:.1f}%</h2><small>recent</small></div>", unsafe_allow_html=True)
 
-    with col3:
+    with m3:
         if task_history:
-            avg_time = sum(t["execution_time"] for t in task_history) / len(task_history)
-            st.markdown(f"<div class='metric-card'><h3>Avg Exec Time</h3><h2>{avg_time:.3f}s</h2></div>", unsafe_allow_html=True)
+            avg_time = sum(t.get("execution_time", 0) for t in task_history) / max(len(task_history),1)
+            st.markdown(f"<div class='metric-box'><h4 style='margin:0;'>Avg Exec Time</h4><h2 style='margin:6px 0 0 0;'>{avg_time:.3f}s</h2><small>per task</small></div>", unsafe_allow_html=True)
         else:
-            st.markdown("<div class='metric-card'><h3>Avg Exec Time</h3><h2>N/A</h2></div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='metric-box'><h4 style='margin:0;'>Avg Exec Time</h4><h2 style='margin:6px 0 0 0;'>N/A</h2></div>", unsafe_allow_html=True)
 
-    with col4:
-        total_cost = sum(n["total_cost"] for n in node_stats)
-        st.markdown(f"<div class='metric-card'><h3>Total Cost</h3><h2>${total_cost:.2f}</h2></div>", unsafe_allow_html=True)
+    with m4:
+        total_cost = sum(n.get("total_cost", 0) for n in node_stats)
+        st.markdown(f"<div class='metric-box'><h4 style='margin:0;'>Total Cost</h4><h2 style='margin:6px 0 0 0;'>${total_cost:.2f}</h2><small>aggregated</small></div>", unsafe_allow_html=True)
 
 st.markdown("---")
-st.markdown("## 🖥️ Node Health Status")
+st.markdown("## 🖥️ Node Health")
 
 if node_status:
-    col1, col2, col3 = st.columns(3)
-    for node_name, col in zip(["EDGE", "CLOUD", "GPU"], [col1, col2, col3]):
-        s = node_status.get(node_name, {})
+    n1, n2, n3 = st.columns(3)
+    for name, col in zip(["EDGE","CLOUD","GPU"], [n1,n2,n3]):
+        s = node_status.get(name, {})
         load = s.get("load", 0)
         latency = s.get("latency", 0)
         cost = s.get("cost_per_task", 0)
         active = s.get("active_tasks", 0)
         health = s.get("health", "unknown")
 
-        color = "green" if health == "healthy" else "orange" if health == "warning" else "red"
-        emoji = "🟢" if health == "healthy" else "🟡" if health == "warning" else "🔴"
-
+        emoji = "🟢" if health=="healthy" else "🟡" if health=="warning" else "🔴"
         with col:
-            st.markdown(f"<div class='node-card'><h3>{emoji} {node_name} Node</h3>", unsafe_allow_html=True)
+            st.markdown(f"<div class='node-card'><h4 style='margin:0;'>{emoji} {name} Node</h4><div class='small'>status: {health}</div>", unsafe_allow_html=True)
 
             fig = go.Figure(go.Indicator(
                 mode="gauge+number",
                 value=load,
-                title={'text': "Load %", 'font': {'color': 'white'}},
+                title={'text': "Load %", 'font': {'color': '#ffffff'}},
                 gauge={
-                    'axis': {'range': [0, 100], 'tickcolor': 'white'},
-                    'bar': {'color': color},
-                    'bgcolor': "#111827"
+                    'axis': {'range':[0,100], 'tickcolor':'#ffffff'},
+                    'bar': {'color': "#667eea"},
+                    'steps': [
+                        {'range':[0,60], 'color':'#18304a'},
+                        {'range':[60,85], 'color':'#2b3550'},
+                        {'range':[85,100], 'color':'#3b2b3b'}
+                    ]
                 }
             ))
-            fig.update_layout(height=180, margin=dict(l=5, r=5, t=40, b=0), paper_bgcolor="#161a22", font_color="white")
+            fig.update_layout(height=180, margin=dict(l=5,r=5,t=30,b=0), paper_bgcolor='rgba(0,0,0,0)', font_color='#e6eef8')
             st.plotly_chart(fig, use_container_width=True)
 
-            st.metric("Latency", f"{latency} ms")
-            st.metric("Cost/Task", f"${cost}")
-            st.metric("Active Tasks", active)
-            st.markdown("</div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='display:flex; gap:12px; margin-top:8px;'><div><strong>Latency</strong><div class='small'>{latency} ms</div></div><div><strong>Cost</strong><div class='small'>${cost}</div></div><div><strong>Active</strong><div class='small'>{active}</div></div></div></div>", unsafe_allow_html=True)
 else:
     st.warning("Unable to fetch node status")
 
@@ -248,77 +346,82 @@ st.markdown("## 📊 Workload Distribution")
 
 if task_history:
     df = pd.DataFrame(task_history)
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        node_counts = df["chosen_node"].value_counts()
-        fig = px.pie(
-            values=node_counts.values,
-            names=node_counts.index,
-            title="Tasks by Node"
-        )
-        st.plotly_chart(fig, use_container_width=True)
-
-    with col2:
-        type_counts = df["task_type"].value_counts()
-        fig = px.bar(
-            x=type_counts.index,
-            y=type_counts.values,
-            title="Tasks by Type"
-        )
+    c1, c2 = st.columns(2)
+    with c1:
+        node_counts = df.get("chosen_node", pd.Series()).value_counts()
+        if len(node_counts) == 0:
+            st.info("No tasks recorded yet.")
+        else:
+            fig = px.pie(values=node_counts.values, names=node_counts.index, title="Tasks by Node", hole=0.35)
+            fig.update_traces(textposition='inside', textinfo='percent+label')
+            st.plotly_chart(fig, use_container_width=True)
+    with c2:
+        type_counts = df.get("task_type", pd.Series()).value_counts()
+        fig = px.bar(x=type_counts.index, y=type_counts.values, title="Tasks by Type")
         st.plotly_chart(fig, use_container_width=True)
 
 st.markdown("---")
-st.markdown("## 💰 Cost & Performance Analysis")
+st.markdown("## 💰 Cost & Performance")
 
 if task_history:
-    col1, col2 = st.columns(2)
-
-    with col1:
-        cost_by_node = df.groupby("chosen_node")["cost"].sum().reset_index()
-        fig = px.bar(cost_by_node, x="chosen_node", y="cost", title="Total Cost by Node")
-        st.plotly_chart(fig, use_container_width=True)
-
-    with col2:
-        time_by_node = df.groupby("chosen_node")["execution_time"].mean().reset_index()
-        fig = px.bar(time_by_node, x="chosen_node", y="execution_time", title="Average Execution Time by Node")
-        st.plotly_chart(fig, use_container_width=True)
+    c1, c2 = st.columns(2)
+    with c1:
+        if "cost" in df.columns:
+            cost_by_node = df.groupby("chosen_node")["cost"].sum().reset_index()
+            fig = px.bar(cost_by_node, x="chosen_node", y="cost", title="Total Cost by Node")
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("Cost data not available in task history.")
+    with c2:
+        if "execution_time" in df.columns:
+            time_by_node = df.groupby("chosen_node")["execution_time"].mean().reset_index()
+            fig = px.bar(time_by_node, x="chosen_node", y="execution_time", title="Avg Execution Time by Node")
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("Execution time data not available.")
 
 st.markdown("---")
 st.markdown("## 📋 Task Execution History")
 
 if task_history:
     df = pd.DataFrame(task_history)
-
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        filter_node = st.selectbox("Filter by Node", ["All"] + list(df["chosen_node"].unique()))
-
-    with col2:
-        filter_status = st.selectbox("Filter by Status", ["All"] + list(df["status"].unique()))
-
-    with col3:
+    f1, f2, f3 = st.columns(3)
+    with f1:
+        filter_node = st.selectbox("Filter by Node", ["All"] + list(df.get("chosen_node", pd.Series()).unique()))
+    with f2:
+        filter_status = st.selectbox("Filter by Status", ["All"] + list(df.get("status", pd.Series()).unique()))
+    with f3:
         limit = st.slider("Rows to Display", 10, 200, 50)
 
-    filtered_df = df.copy()
+    filtered = df.copy()
     if filter_node != "All":
-        filtered_df = filtered_df[filtered_df["chosen_node"] == filter_node]
+        filtered = filtered[filtered["chosen_node"] == filter_node]
     if filter_status != "All":
-        filtered_df = filtered_df[filtered_df["status"] == filter_status]
+        filtered = filtered[filtered["status"] == filter_status]
 
-    st.dataframe(filtered_df.head(limit), use_container_width=True, hide_index=True)
+    # ---------------------- BEAUTIFUL TABLE WRAPPER ----------------------
+    st.markdown("<div class='table-container'>", unsafe_allow_html=True)
 
-    csv = filtered_df.to_csv(index=False)
+    st.dataframe(
+        filtered.head(limit),
+        use_container_width=True,
+        hide_index=True
+    )
+
+    st.markdown("</div>", unsafe_allow_html=True)
+    # ---------------------------------------------------------------------
+
+    csv = filtered.to_csv(index=False)
     st.download_button(
-        label="📥 Download CSV",
+        "📥 Download CSV",
         data=csv,
         file_name=f"task_history_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
         mime="text/csv"
     )
+
 else:
-    st.info("No task history available yet.")
+    st.info("No task history available. Use the Demo UI to create tasks.")
 
 st.markdown("---")
-st.caption("AI Workload Orchestrator Admin Dashboard • Auto-updates every 10s when enabled")
+st.caption("AI Workload Orchestrator · Admin Dashboard · UI matched to Demo")
+
