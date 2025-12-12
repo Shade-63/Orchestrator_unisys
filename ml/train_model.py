@@ -32,7 +32,7 @@ def generate_synthetic_data(n_samples=1000):
             if priority >= 2: # High priority
                 label = "cloud" # Reliable
             else:
-                label = "edge" # Cheaper/Closer (Mock logic)
+                label = "edge" # Cheaper/Closer (Mock logic) 
         
         data.append([cpu_req, ram_req, priority, latency_sensitive, gpu_required, label])
     
