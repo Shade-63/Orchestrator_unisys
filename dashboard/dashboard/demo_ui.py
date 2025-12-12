@@ -358,19 +358,19 @@ col1, col2, col3, col4 = st.columns(4)
 
 screenshots = [
     {
-        "path": "C:/Users/sumsr/.gemini/antigravity/brain/47b67666-525d-475e-9e4c-ca68187374ac/step1_demo_ui_1765571611127.png",
+        "path": "dashboard/assets/screenshots/step1_demo_ui.png",
         "caption": "1. Submit Task"
     },
     {
-        "path": "C:/Users/sumsr/.gemini/antigravity/brain/47b67666-525d-475e-9e4c-ca68187374ac/step2_task_result_1765571630913.png",
+        "path": "dashboard/assets/screenshots/step2_task_result.png",
         "caption": "2. View Result"
     },
     {
-        "path": "C:/Users/sumsr/.gemini/antigravity/brain/47b67666-525d-475e-9e4c-ca68187374ac/step3_admin_login_1765571652856.png",
+        "path": "dashboard/assets/screenshots/step3_admin_login.png",
         "caption": "3. Admin Login"
     },
     {
-        "path": "C:/Users/sumsr/.gemini/antigravity/brain/47b67666-525d-475e-9e4c-ca68187374ac/step4_admin_dashboard_1765571675305.png",
+        "path": "dashboard/assets/screenshots/step4_admin_dashboard.png",
         "caption": "4. Dashboard"
     }
 ]
