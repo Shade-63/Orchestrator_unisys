@@ -143,7 +143,7 @@ The project features a **Premium Admin Dashboard** to visualize the decisions ma
 - **Cost Analysis**: Real-time calculation of operational costs based on node usage.
 - **Analytics**: Charts showing task distribution accuracy and performance trends.
 
-> **Access**: Click "🔐 Sign in as admin" in the Demo UI sidebar. Credentials: `admin` / `admin123`.
+> **Access**: Click "🔐 Sign in as admin" in the Demo UI sidebar.
 
 ---
 
