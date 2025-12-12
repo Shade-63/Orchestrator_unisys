@@ -1,260 +1,347 @@
-"""
-Demo UI - Interactive Workload Submission Interface
-Simulates real-world task triggers with button-based interactions
-"""
-
 import streamlit as st
 import requests
 import json
 import time
 from typing import Dict, Any
 
-# Page configuration
 st.set_page_config(
-    page_title="AI Workload Orchestrator - Demo",
+    page_title="AI Workload Orchestrator",
     page_icon="🚀",
     layout="wide"
 )
 
-# Orchestrator API endpoint
-ORCHESTRATOR_URL = "http://localhost:8000/api"
-
-# Custom CSS for better UI
 st.markdown("""
 <style>
-    .stButton>button {
-        width: 100%;
-        height: 80px;
-        font-size: 18px;
-        font-weight: bold;
-        border-radius: 10px;
-        margin: 5px 0;
+
+@keyframes fadeIn {
+    0% { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+    0% { opacity: 0; transform: translateX(-20px); }
+    100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.9; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes glow {
+    0% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.3); }
+    50% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+    100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.3); }
+}
+
+@keyframes rocketFly {
+    0% {
+        transform: translateX(-100px) translateY(100px) rotate(-45deg);
+        opacity: 0;
     }
-    .success-box {
-        padding: 20px;
-        border-radius: 10px;
-        background-color: #d4edda;
-        border: 1px solid #c3e6cb;
-        margin: 10px 0;
+    50% {
+        transform: translateX(-30px) translateY(30px) rotate(-20deg);
+        opacity: 1;
     }
-    .metric-card {
-        background-color: #f8f9fa;
-        padding: 15px;
-        border-radius: 8px;
-        border-left: 4px solid #007bff;
+    100% {
+        transform: translateX(0) translateY(0) rotate(0deg);
+        opacity: 1;
     }
+}
+
+.rocket-icon {
+    display: inline-block;
+    animation: rocketFly 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    font-size: 1.5em;
+}
+
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 50px 40px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    animation: fadeIn 0.8s ease-in-out;
+    box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hero-title {
+    font-size: 48px;
+    font-weight: 800;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    margin: 0;
+}
+
+.hero-subtitle {
+    font-size: 22px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+    margin-top: 10px;
+}
+
+.workload-section {
+    animation: slideIn 0.6s ease-in-out;
+}
+
+.result-card, .metric-box {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.stButton>button {
+    width: 100%;
+    height: 60px;
+    font-size: 16px;
+    border-radius: 12px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    transition: all 0.3s ease-in-out;
+    border: none;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stButton>button:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+}
+
+.stButton>button:active {
+    transform: scale(0.97);
+}
+
+.pulse-btn {
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+.metric-box {
+    padding: 22px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+    border: 1px solid #e0e0e0;
+    margin-bottom: 12px;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.metric-box:hover {
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.15);
+    transform: translateY(-4px);
+    border-color: #667eea;
+}
+
+.result-card {
+    padding: 22px;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    margin-bottom: 12px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease-in-out;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.result-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+    border-color: #667eea;
+}
+
+.sidebar-section {
+    padding: 12px 0;
+    border-bottom: 1px solid #e0e0e0;
+    animation: slideIn 0.6s ease-in-out;
+}
+
+.node-status-healthy {
+    padding: 15px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-radius: 10px;
+    color: white;
+    margin: 8px 0;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.node-status-warning {
+    padding: 15px;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    border-radius: 10px;
+    color: white;
+    margin: 8px 0;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+}
+
+.node-status-critical {
+    padding: 15px;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    border-radius: 10px;
+    color: white;
+    margin: 8px 0;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+h2, h3 {
+    animation: slideIn 0.6s ease-in-out;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
-# Title and description
-st.title("🚀 AI Workload Orchestrator")
-st.markdown("### Interactive Demo - Real-Time Task Routing")
-st.markdown("---")
+ORCHESTRATOR_URL = "http://localhost:8000/api"
 
-# Initialize session state
-if 'results' not in st.session_state:
+if "results" not in st.session_state:
     st.session_state.results = []
 
-def submit_task(task_type: str, priority: int, latency: int, requires_gpu: bool, description: str) -> None:
-    """Submit task to orchestrator and display results"""
-    
-    with st.spinner(f"🔄 Routing {description}..."):
+
+def submit_task(task_type, priority, latency, requires_gpu, description):
+    with st.spinner(f"Routing {description}..."):
         try:
-            # Prepare task payload
             payload = {
                 "taskType": task_type,
                 "priority": priority,
                 "latency": latency,
                 "requiresGPU": requires_gpu,
-                "payload": {
-                    "description": description,
-                    "timestamp": time.time()
-                },
-                "cost_sensitivity": 10 - priority  # Inverse relationship
+                "payload": {"description": description, "timestamp": time.time()},
+                "cost_sensitivity": 10 - priority
             }
-            
-            # Submit to orchestrator
-            response = requests.post(
-                f"{ORCHESTRATOR_URL}/submit-task",
-                json=payload,
-                timeout=30
-            )
-            
+
+            response = requests.post(f"{ORCHESTRATOR_URL}/submit-task", json=payload, timeout=30)
+
             if response.status_code == 200:
                 result = response.json()
-                
-                # Store result in session state
                 st.session_state.results.insert(0, {
-                    'description': description,
-                    'result': result,
-                    'timestamp': time.time()
+                    "description": description,
+                    "result": result,
+                    "timestamp": time.time()
                 })
-                
-                # Display success
-                st.success(f"✅ Task routed successfully!")
-                
-                # Display routing decision
+
+                st.success("Task routed successfully!")
+
                 col1, col2, col3, col4 = st.columns(4)
-                
-                with col1:
-                    st.metric("Chosen Node", result['chosen_node'])
-                
-                with col2:
-                    st.metric("Confidence", f"{result['confidence']:.1%}")
-                
-                with col3:
-                    st.metric("Execution Time", f"{result['execution_time']:.3f}s")
-                
-                with col4:
-                    st.metric("Cost", f"${result['cost']:.4f}")
-                
-                # Display explanation
-                st.info(f"**Decision Explanation:** {result['explanation']}")
-                
+                col1.metric("Chosen Node", result["chosen_node"])
+                col2.metric("Confidence", f"{result['confidence']:.1%}")
+                col3.metric("Execution Time", f"{result['execution_time']:.3f}s")
+                col4.metric("Cost", f"${result['cost']:.4f}")
+
+                st.info(f"Explanation: {result['explanation']}")
+
             else:
-                st.error(f"❌ Error: {response.status_code} - {response.text}")
-        
+                st.error(f"Error {response.status_code}: {response.text}")
+
         except requests.exceptions.ConnectionError:
-            st.error("❌ Cannot connect to orchestrator. Make sure all services are running.")
+            st.error("Cannot connect to orchestrator. Ensure backend is running.")
         except Exception as e:
-            st.error(f"❌ Error: {str(e)}")
+            st.error(f"Unexpected Error: {str(e)}")
 
 
-# Main UI - Task Buttons
-st.markdown("## 🎯 Simulate Real-World Workloads")
-st.markdown("Click buttons below to trigger different types of tasks:")
+st.markdown("""
+<div class="hero-section">
+    <div class="hero-title"><span class="rocket-icon">🚀</span> AI Workload Orchestrator</div>
+    <div class="hero-subtitle">Real-Time Intelligent Task Routing Demo</div>
+</div>
+""", unsafe_allow_html=True)
 
-# Create two columns for buttons
-col_left, col_right = st.columns(2)
 
-with col_left:
-    st.markdown("### ⚡ Real-Time Tasks")
-    
-    if st.button("🔍 Run Fraud Detection", use_container_width=True):
-        submit_task(
-            task_type="fraud_detection",
-            priority=9,
-            latency=10,
-            requires_gpu=False,
-            description="Real-time fraud detection on transaction"
-        )
-    
-    if st.button("📡 Trigger Sensor Alert", use_container_width=True):
-        submit_task(
-            task_type="sensor_alert",
-            priority=10,
-            latency=10,
-            requires_gpu=False,
-            description="Critical sensor alert - temperature threshold exceeded"
-        )
-    
-    if st.button("🖼️ Image Classification", use_container_width=True):
-        submit_task(
-            task_type="image_classification",
-            priority=7,
-            latency=6,
-            requires_gpu=True,
-            description="Classify uploaded images using CNN model"
-        )
+st.markdown("## 🎯 Trigger Workloads")
+st.markdown("**Select a workload to route through the AI Orchestrator**")
 
-with col_right:
-    st.markdown("### 📊 Batch Processing Tasks")
-    
-    if st.button("📈 Generate Daily Report", use_container_width=True):
-        submit_task(
-            task_type="daily_report",
-            priority=3,
-            latency=2,
-            requires_gpu=False,
-            description="Generate daily analytics report"
-        )
-    
-    if st.button("🤖 ML Training Job", use_container_width=True):
-        submit_task(
-            task_type="ml_training",
-            priority=5,
-            latency=3,
-            requires_gpu=True,
-            description="Train deep learning model on large dataset"
-        )
-    
-    if st.button("🔄 Data Processing Pipeline", use_container_width=True):
-        submit_task(
-            task_type="data_processing",
-            priority=4,
-            latency=3,
-            requires_gpu=False,
-            description="Process and transform large dataset"
-        )
+left, right = st.columns(2)
+
+with left:
+    st.markdown("### ⚡ Real-Time Workloads")
+    st.markdown("*Low-latency, high-priority tasks*")
+    if st.button("🔍 Fraud Detection", key="fraud"):
+        submit_task("fraud_detection", 9, 10, False, "Real-time fraud detection")
+    if st.button("📡 Sensor Alert", key="sensor"):
+        submit_task("sensor_alert", 10, 10, False, "Critical sensor alert")
+    if st.button("🖼️ Image Classification", key="image"):
+        submit_task("image_classification", 7, 6, True, "Run CNN image classification")
+
+with right:
+    st.markdown("### 📊 Batch Workloads")
+    st.markdown("*High-latency tolerance tasks*")
+    if st.button("📈 Daily Report Generation", key="report"):
+        submit_task("daily_report", 3, 2, False, "Generate daily analytics")
+    if st.button("🤖 ML Training Job", key="training"):
+        submit_task("ml_training", 5, 3, True, "Deep learning training workload")
+    if st.button("🔄 Data Pipeline Execution", key="pipeline"):
+        submit_task("data_processing", 4, 3, False, "Process data pipeline")
 
 st.markdown("---")
 
-# Recent Results Section
+
 if st.session_state.results:
-    st.markdown("## 📋 Recent Task Executions")
+    st.markdown("## 📋 Recent Executions")
+    st.markdown("**Latest orchestration decisions and routing results**")
     
     for idx, item in enumerate(st.session_state.results[:5]):
-        result = item['result']
-        
-        with st.expander(f"**{item['description']}** → {result['chosen_node']}", expanded=(idx == 0)):
-            col1, col2 = st.columns([2, 1])
+        result = item["result"]
+
+        with st.expander(f"{'✅' if result['status'] == 'completed' else '⏳'} {item['description']} → {result['chosen_node']}", expanded=(idx == 0)):
+            col1, col2, col3 = st.columns([2, 2, 1])
             
             with col1:
-                st.markdown(f"**Explanation:** {result['explanation']}")
-                st.markdown(f"**Task ID:** `{result['task_id']}`")
-                st.markdown(f"**Status:** {result['status'].upper()}")
-            
+                st.markdown(f"**🔹 Explanation:** {result['explanation']}")
             with col2:
-                st.metric("Node", result['chosen_node'])
-                st.metric("Time", f"{result['execution_time']:.3f}s")
-                st.metric("Cost", f"${result['cost']:.4f}")
-                st.metric("Confidence", f"{result['confidence']:.1%}")
+                st.markdown(f"**🔹 Task ID:** `{result['task_id']}`")
+            with col3:
+                st.markdown(f"**🔹 Status:** `{result['status'].upper()}`")
 
-    # Clear history button
-    if st.button("🗑️ Clear History"):
-        st.session_state.results = []
-        st.rerun()
-
-else:
-    st.info("👆 Click any button above to submit a task and see routing decisions in real-time!")
-
-# Sidebar - System Status
-with st.sidebar:
-    st.markdown("### 📊 System Status")
-    
-    if st.button("🔄 Refresh Status"):
-        st.rerun()
-    
-    try:
-        # Get node status
-        status_response = requests.get(f"{ORCHESTRATOR_URL}/node-status", timeout=5)
-        
-        if status_response.status_code == 200:
-            node_status = status_response.json()['nodes']
+            st.divider()
             
-            for node_name in ['EDGE', 'CLOUD', 'GPU']:
-                status = node_status.get(node_name, {})
-                load = status.get('load', 0)
-                health = status.get('health', 'unknown')
+            col1, col2, col3, col4 = st.columns(4)
+            col1.metric("📍 Node", result["chosen_node"])
+            col2.metric("⏱️ Execution Time", f"{result['execution_time']:.3f}s")
+            col3.metric("💰 Cost", f"${result['cost']:.4f}")
+            col4.metric("🎯 Confidence", f"{result['confidence']:.1%}")
+
+    col1, col2 = st.columns([4, 1])
+    with col2:
+        if st.button("🗑️ Clear History", use_container_width=True):
+            st.session_state.results = []
+            st.rerun()
+else:
+    st.info("📌 Submit a task to view routing insights.")
+
+
+with st.sidebar:
+    st.header("📊 System Overview")
+
+    if st.button("🔄 Refresh System Status", use_container_width=True):
+        st.rerun()
+
+    try:
+        status_response = requests.get(f"{ORCHESTRATOR_URL}/node-status", timeout=5)
+
+        if status_response.status_code == 200:
+            data = status_response.json()["nodes"]
+
+            for node in ["EDGE", "CLOUD", "GPU"]:
+                s = data.get(node, {})
+                health = s.get("health", "unknown")
+                load = s.get("load", 0)
+                latency = s.get("latency", 0)
+
+                emoji = "🟢" if health == "healthy" else "🟡" if health == "warning" else "🔴"
                 
-                # Color coding based on health
-                if health == 'healthy':
-                    color = '🟢'
-                elif health == 'warning':
-                    color = '🟡'
-                else:
-                    color = '🔴'
+                st.markdown(f"### {emoji} {node}")
                 
-                st.markdown(f"{color} **{node_name}**")
+                col1, col2 = st.columns(2)
+                col1.metric("Load", f"{load:.1f}%")
+                col2.metric("Latency", f"{latency:.0f}ms")
+                
                 st.progress(load / 100)
-                st.caption(f"Load: {load:.1f}% | Latency: {status.get('latency', 0):.0f}ms")
-        
+                
+                st.markdown("---")
         else:
-            st.warning("Cannot fetch node status")
-    
+            st.warning("⚠️ Unable to load node status.")
+
     except:
-        st.error("Orchestrator offline")
-    
+        st.error("🔴 Orchestrator is offline.")
+
     st.markdown("---")
-    st.markdown("### ℹ️ About")
-    st.caption("This demo simulates real-world workload routing using ML-based decision making.")
+    st.caption("🚀 AI Workload Orchestrator Demo UI v1.0")
