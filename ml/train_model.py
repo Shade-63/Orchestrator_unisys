@@ -14,10 +14,10 @@ def generate_synthetic_data(n_samples=1000):
     """
     data = []
     for _ in range(n_samples):
-        cpu_req = np.random.uniform(1, 32)
-        ram_req = np.random.uniform(1, 128)
-        priority = np.random.choice([0, 1, 2, 3]) # Low to Critical
-        latency_sensitive = np.random.choice([0, 1])
+        cpu_req = np.random.uniform(1, 32) #mainky the range for cpu is 1 to 32 so we used this and created random values to train our model
+        ram_req = np.random.uniform(1, 128) #used 1,128 as ram mostly lies b/w 1 to 128 GB 
+        priority = np.random.choice([0, 1, 2, 3]) # Low to Critical precedence order/ emergency order
+        latency_sensitive = np.random.choice([0, 1]) #creating numerical switch like scenario where 0 means no and 1 means yes.
         gpu_required = np.random.choice([0, 1], p=[0.8, 0.2])
         
         # Logic to determine "Ground Truth" label
