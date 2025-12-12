@@ -423,11 +423,9 @@ else:
 
 with st.sidebar:
     # Admin access button at the top
-    st.link_button(
-        "🔐 Sign in as admin",
-        "http://localhost:8502",
-        use_container_width=True
-    )
+    # Admin access button at the top
+    if st.button("🔐 Sign in as admin", use_container_width=True):
+        st.switch_page("pages/Admin_Dashboard.py")
     
     st.markdown("---")
     st.header("📊 System Overview")
