@@ -324,9 +324,9 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown("""
-<div class="result-card" style="padding: 20px; text-align: center;">
-    <h3 style="color: #667eea; margin-bottom: 15px;">📸 Workflow Demo</h3>
-    <p style="font-size: 13px; color: #666; margin-bottom: 20px;">
+<div class="result-card" style="padding: 20px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px;">
+    <h3 style="color: white; margin-bottom: 15px; font-weight: 600;">📸 Workflow Demo</h3>
+    <p style="font-size: 13px; color: rgba(255, 255, 255, 0.9); margin-bottom: 20px;">
         Click on a step number to see the complete workflow in action
     </p>
 </div>
