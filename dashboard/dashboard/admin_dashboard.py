@@ -295,7 +295,14 @@ with st.sidebar:
     st.markdown(f"### 👤 Logged in as: **{st.session_state.username}**")
     if st.button("🚪 Logout", use_container_width=True):
         logout()
-        st.rerun()
+        # Redirect to demo UI after logout
+        st.markdown("""
+        <script>
+            window.location.href = "http://localhost:8501";
+        </script>
+        """, unsafe_allow_html=True)
+        st.success("Logged out! Redirecting to Demo UI...")
+        time.sleep(1)
     st.markdown("---")
 
 @st.cache_data(ttl=8)
