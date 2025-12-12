@@ -266,7 +266,7 @@ st.markdown("""
 
 col1, col2 = st.columns([3, 1])
 with col2:
-    auto_refresh = st.checkbox("Auto-refresh (10s)", value=False)
+    auto_refresh = st.checkbox("Auto-refresh (5s)", value=False)
     if st.button("🔄 Refresh Now"):
         st.rerun()
 
