@@ -3,6 +3,12 @@ import requests
 import json
 import time
 from typing import Dict, Any
+import os
+from pathlib import Path
+
+# Get the directory where this script is located
+SCRIPT_DIR = Path(__file__).parent
+ASSETS_DIR = SCRIPT_DIR.parent / "assets" / "screenshots"
 
 st.set_page_config(
     page_title="AI Workload Orchestrator",
@@ -358,19 +364,19 @@ col1, col2, col3, col4 = st.columns(4)
 
 screenshots = [
     {
-        "path": "C:/Users/sumsr/.gemini/antigravity/brain/47b67666-525d-475e-9e4c-ca68187374ac/step1_demo_ui_1765571611127.png",
+        "path": str(ASSETS_DIR / "step1_demo_ui.png"),
         "caption": "1. Submit Task"
     },
     {
-        "path": "C:/Users/sumsr/.gemini/antigravity/brain/47b67666-525d-475e-9e4c-ca68187374ac/step2_task_result_1765571630913.png",
+        "path": str(ASSETS_DIR / "step2_task_result.png"),
         "caption": "2. View Result"
     },
     {
-        "path": "C:/Users/sumsr/.gemini/antigravity/brain/47b67666-525d-475e-9e4c-ca68187374ac/step3_admin_login_1765571652856.png",
+        "path": str(ASSETS_DIR / "step3_admin_login.png"),
         "caption": "3. Admin Login"
     },
     {
-        "path": "C:/Users/sumsr/.gemini/antigravity/brain/47b67666-525d-475e-9e4c-ca68187374ac/step4_admin_dashboard_1765571675305.png",
+        "path": str(ASSETS_DIR / "step4_admin_dashboard.png"),
         "caption": "4. Dashboard"
     }
 ]
@@ -423,11 +429,9 @@ else:
 
 with st.sidebar:
     # Admin access button at the top
-    st.link_button(
-        "🔐 Sign in as admin",
-        "http://localhost:8502",
-        use_container_width=True
-    )
+    # Admin access button at the top
+    if st.button("🔐 Sign in as admin", use_container_width=True):
+        st.switch_page("pages/Admin_Dashboard.py")
     
     st.markdown("---")
     st.header("📊 System Overview")
