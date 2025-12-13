@@ -115,8 +115,8 @@ The entire project is orchestrated via `docker-compose`. You don't need to insta
 
 1.  **Clone the Repository**
     ```bash
-    git clone https://github.com/yourusername/ai-workload-orchestrator.git
-    cd ai-workload-orchestrator
+    git clone https://github.com/Shade-63/Orchestrator_unisys.git
+    cd Orchestrator_unisys
     ```
 
 2.  **Launch Services**
@@ -126,10 +126,7 @@ The entire project is orchestrated via `docker-compose`. You don't need to insta
     *This command builds the images for the orchestrator, nodes, and dashboards, and starts the network.*
 
 3.  **Access the Application**
-    - **🚀 Demo UI**: [http://localhost:8501](http://localhost:8501) (Submit tasks here)
-    - **📊 Admin Dashboard**: Log in via the Demo UI sidebar.
-    - **📈 Grafana**: [http://localhost:3000](http://localhost:3000) (Default user/pass: `admin`/`admin`)
-    - **🔌 API Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
+    - **🚀 Checkouot the project through**: https://demo-ui-production-0e26.up.railway.app (Submit tasks here)
 
 ---
 
@@ -157,6 +154,6 @@ The project features a **Premium Admin Dashboard** to visualize the decisions ma
 
 <div align="center">
 
-**Built with ❤️ for the AI Orchestrator Hackathon**
+**Built with ❤️**
 
 </div>
